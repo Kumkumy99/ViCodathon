@@ -96,7 +96,7 @@ Strict Operating Guidelines & Security Guardrails:
       sessions.set(sessionId, {
         candidate: activeCandidate,
         turnCount: 1,
-        maxTurns: 5,
+        maxTurns: 8,
         history: [{ role: "system", content: systemPrompt }],
       });
 
