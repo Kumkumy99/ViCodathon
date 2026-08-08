@@ -3,7 +3,7 @@ import MessageBubble, { BOT_NAME } from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import FeedbackCard from './FeedbackCard'
 import { mockFeedback, mockMessages, mockAiReplies } from '../data/mockData'
-
+import candidatesData from '../data/candidates.json'
 const TOTAL_QUESTIONS = 8
 
 let replyIndex = 0
@@ -204,6 +204,47 @@ const [interviewStarted, setInterviewStarted] = useState(false)
     )
   }
 
+  
+
+  if (!interviewStarted) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#0a0515] px-4 text-white">
+      <div className="w-full max-w-md rounded-3xl border border-[#7a29ff]/20 bg-[#120b24] p-8 shadow-2xl">
+        <h1 className="text-2xl font-bold">
+          AI Technical Interview
+        </h1>
+
+        <p className="mt-2 text-sm text-[#b0a8c0]">
+          Select your candidate profile to begin your personalized interview.
+        </p>
+
+        <select
+          value={selectedCandidate}
+          onChange={(e) => setSelectedCandidate(e.target.value)}
+          className="mt-6 w-full rounded-xl border border-[#7a29ff]/20 bg-[#1e1438] px-4 py-3 text-white outline-none"
+        >
+          {candidatesData.candidates.map((candidate) => (
+  <option
+    key={candidate.member.id}
+    value={candidate.member.id}
+  >
+    {candidate.member.name}
+  </option>
+))}
+        </select>
+
+        <button
+          type="button"
+          disabled={!selectedCandidate}
+          onClick={() => setInterviewStarted(true)}
+          className="gradient-accent mt-5 w-full rounded-xl px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Start Interview
+        </button>
+      </div>
+    </div>
+  )
+}
   return (
     <div className={`flex h-full min-h-screen flex-col ${shellClass}`}>
       <header className={`shrink-0 border-b backdrop-blur-md ${headerClass}`}>
