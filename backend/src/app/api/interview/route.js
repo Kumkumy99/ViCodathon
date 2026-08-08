@@ -155,20 +155,55 @@ CRITICAL INTERVIEW RULES:
     // FINAL TURN: REPORT GENERATION (Turn >= 9)
     // -------------------------------------------------------------------------
     if (session.turnCount >= session.maxTurns) {
-      const evaluationPrompt = `The 8-question technical interview with ${activeCandidate.name || "Candidate"} is complete.
-Evaluate their performance across curriculum depth.
+      const evaluationPrompt = ` The 8-question technical interview with the candidate is complete.
 
-Return ONLY a valid JSON object matching EXACTLY this structure:
+Evaluate the candidate STRICTLY from the actual interview transcript.
+
+IMPORTANT:
+- Judge ONLY what the candidate actually said.
+- Do NOT assume knowledge that was not demonstrated.
+- Do NOT reward participation, confidence, verbosity, or completing all questions.
+- An irrelevant, random, nonsensical, or off-topic answer receives little or no credit.
+- An incorrect technical answer receives little or no credit.
+- A partially correct answer receives partial credit only.
+- "I don't know" receives 0 technical credit for that question.
+- Asking for a hint is acceptable, but credit only knowledge demonstrated after the hint.
+- NEVER invent strengths.
+- Every strength MUST be supported by something the candidate actually demonstrated.
+- If the candidate gives mostly random/irrelevant answers, the strengths array should be empty or contain only genuinely demonstrated non-technical strengths.
+- If the candidate demonstrates very little technical knowledge, scores should be low.
+
+SCORING:
+0-20 = almost no relevant technical knowledge demonstrated
+21-40 = major gaps; mostly incorrect or incomplete
+41-60 = partial understanding with significant gaps
+61-80 = generally correct technical understanding
+81-100 = consistently correct, technically strong, and demonstrates depth
+
+IMPORTANT SCORE CAP:
+Do NOT give any score above 60 unless the transcript contains clear evidence of substantial correct technical knowledge.
+
+For each score, consider:
+- coreFundamentals: correctness of core AI engineering concepts
+- systemArchitecture: ability to reason about RAG, vector databases, agents, MCP, deployment, and system design
+- problemSolving: quality of reasoning, diagnosis, tradeoffs, and technical approach
+
+Before assigning scores, compare EACH candidate answer with the question that immediately preceded it.
+
+If the candidate's answers are random or unrelated to the questions, explicitly state this in the summary and gaps.
+
+Return ONLY valid JSON matching this exact structure:
+
 {
-  "summary": "Detailed technical performance evaluation based on their answers",
+  "summary": "Evidence-based technical assessment",
   "scores": {
-    "coreFundamentals": 85,
-    "systemArchitecture": 75,
-    "problemSolving": 80
+    "coreFundamentals": 0,
+    "systemArchitecture": 0,
+    "problemSolving": 0
   },
-  "strengths": ["Key technical strength 1", "Key technical strength 2"],
-  "gaps": ["Area needing further practical experience"],
-  "next": ["Actionable recommendation for production AI engineering"]
+  "strengths": [],
+  "gaps": [],
+  "next": []
 }`;
 
       // FIX: Higher max_tokens (800) so JSON report is never truncated
@@ -193,12 +228,16 @@ Return ONLY a valid JSON object matching EXACTLY this structure:
       } catch (parseErr) {
         console.error("JSON Parse Error, Raw content:", rawContent);
         feedbackData = {
-          summary: `Technical interview completed for ${activeCandidate.name || 'Candidate'}. Evaluated across core AI Cohort modules including RAG, Vector Databases, and System Deployment.`,
-          scores: { coreFundamentals: 82, systemArchitecture: 78, problemSolving: 80 },
-          strengths: ["Solid understanding of RAG components and vector similarity", "Good problem-solving logic"],
-          gaps: ["Can deepen hands-on knowledge in MCP server implementation"],
-          next: ["Build production multi-agent system workflows with fallback controls"],
-        };
+  summary: "The interview was completed, but the automated evaluation could not be parsed.",
+  scores: {
+    coreFundamentals: 0,
+    systemArchitecture: 0,
+    problemSolving: 0,
+  },
+  strengths: [],
+  gaps: ["Automated evaluation could not be completed."],
+  next: ["Retry the interview evaluation."],
+};
       }
 
       sessions.delete(sessionId);
