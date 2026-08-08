@@ -113,6 +113,45 @@ function HeaderBadge() {
   )
 }
 
+function CandidatePreview({ candidate, isDark }) {
+  if (!candidate) return null
+
+  const profile = candidate.member || candidate
+
+  return (
+    <div
+      className={`mt-4 rounded-2xl border p-4 ${
+        isDark
+          ? 'border-[#7a29ff]/20 bg-[#120b25]'
+          : 'border-[#7a29ff]/15 bg-[#f8f6fc]'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold">{profile.name}</p>
+          <p className={`text-xs ${isDark ? 'text-[#b0a8c0]' : 'text-[#6b6280]'}`}>
+            {profile.jobRole}
+          </p>
+        </div>
+        <span className="rounded-full bg-[#d83bd2]/15 px-2.5 py-1 text-[11px] font-medium text-[#d83bd2]">
+          Ready
+        </span>
+      </div>
+
+      <div className={`mt-3 grid gap-2 text-sm ${isDark ? 'text-[#dcd7eb]' : 'text-[#4b3d67]'}`}>
+        <div className="flex items-center justify-between gap-2">
+          <span>Experience</span>
+          <span className="font-medium">{profile.yearsExperience} yrs</span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span>Education</span>
+          <span className="font-medium">{profile.education}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // -----------------------------------------------------------------------------
 // MAIN CHAT WINDOW COMPONENT
 // -----------------------------------------------------------------------------
@@ -137,6 +176,11 @@ export default function ChatWindow({
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
+
+  const candidatesList = candidatesData.candidates || candidatesData || []
+  const selectedCandidateProfile = candidatesList.find(
+    (c) => (c.member?.id || c.id) === selectedCandidate
+  )
 
   // Question Progress Counter
   const aiQuestionCount = messages.filter((m) => m.sender === 'ai').length
@@ -262,8 +306,6 @@ export default function ChatWindow({
 
   // CANDIDATE SELECTION SCREEN
   if (!interviewStarted) {
-    const candidatesList = candidatesData.candidates || candidatesData || []
-
     return (
       <div className={`flex h-full min-h-screen items-center justify-center px-4 ${shellClass}`}>
         <div className="w-full max-w-md rounded-2xl border border-[#7a29ff]/20 bg-[#1e1438]/60 p-6 shadow-xl backdrop-blur-md">
@@ -274,6 +316,17 @@ export default function ChatWindow({
           <p className="mt-2 text-sm text-[#b0a8c0]">
             Select your candidate profile to begin your personalized interview.
           </p>
+
+          <CandidatePreview candidate={selectedCandidateProfile} isDark />
+
+          <div className="mt-4 rounded-xl border border-[#7a29ff]/15 bg-[#120b25]/80 p-3 text-sm text-[#dcd7eb]">
+            <p className="font-semibold">What to expect</p>
+            <ul className="mt-2 space-y-1.5 text-xs text-[#b0a8c0]">
+              <li>• Tailored questions based on the candidate profile</li>
+              <li>• Live follow-up prompts for deeper technical discussion</li>
+              <li>• A structured feedback summary at the end</li>
+            </ul>
+          </div>
 
           <select
             value={selectedCandidate}
@@ -361,6 +414,18 @@ export default function ChatWindow({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            {selectedCandidateProfile && (
+              <div
+                className={`hidden rounded-full border px-2.5 py-1 text-[11px] font-medium sm:inline-flex ${
+                  isDark
+                    ? 'border-[#7a29ff]/20 bg-[#1e1438] text-[#dcd7eb]'
+                    : 'border-[#7a29ff]/15 bg-[#f8f6fc] text-[#4b3d67]'
+                }`}
+              >
+                {selectedCandidateProfile.member?.name || selectedCandidateProfile.name}
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleRestart}
@@ -393,6 +458,21 @@ export default function ChatWindow({
 
       <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-5">
+          {messages.length === 0 && !isTyping && (
+            <div
+              className={`animate-fade-in rounded-2xl border px-4 py-4 text-sm ${
+                isDark
+                  ? 'border-[#7a29ff]/20 bg-[#1e1438]/70 text-[#dcd7eb]'
+                  : 'border-[#7a29ff]/15 bg-white text-[#4b3d67] shadow-sm'
+              }`}
+            >
+              <p className="font-semibold">You’re ready to begin</p>
+              <p className="mt-1 text-[#b0a8c0]">
+                Share your answer naturally and I’ll guide the conversation from there.
+              </p>
+            </div>
+          )}
+
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} isDark={isDark} />
           ))}
