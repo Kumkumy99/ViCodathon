@@ -7,7 +7,8 @@ import candidatesData from "@/data/candidates.json";
 // Vercel execution timeout extension
 export const maxDuration = 30;
 
-const corsHeaders = {
+ const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://vi-codathon-uvzc.vercel.app",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Expose-Headers": "X-Breeth-Episode-Saved",
