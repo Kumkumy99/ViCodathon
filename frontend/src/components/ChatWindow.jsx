@@ -32,6 +32,10 @@ async function sendMessage(message, sessionId, candidate) {
   }
 
   const data = await response.json()
+  if (data.done && data.feedback) {
+  setFinalFeedback(data.feedback)
+  setShowFeedback(true)
+}
 
   return {
     id: crypto.randomUUID(),
@@ -113,6 +117,7 @@ export default function ChatWindow({
   const [isTyping, setIsTyping] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
+  const [finalFeedback, setFinalFeedback] = useState(null)
   const [isDark, setIsDark] = useState(true)
   const [sessionId] = useState(() => crypto.randomUUID())
   const [selectedCandidate, setSelectedCandidate] = useState('')
@@ -207,7 +212,11 @@ const aiMessage = await sendMessage(
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <FeedbackCard feedback={feedback} onClose={() => setShowFeedback(false)} onRestart={handleRestart} />
+          <FeedbackCard
+  feedback={finalFeedback || feedback}
+  onClose={() => setShowFeedback(false)}
+  onRestart={handleRestart}
+/>
         </main>
       </div>
     )
