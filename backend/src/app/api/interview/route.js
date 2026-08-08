@@ -3,8 +3,8 @@ import Groq from "groq-sdk";
 import curriculumData from "@/data/curriculum.json";
 import candidatesData from "@/data/candidates.json";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "http://localhost:5173",
+ const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://vi-codathon-uvzc.vercel.app",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
