@@ -14,16 +14,17 @@ let replyIndex = 0
  */
  const SESSION_ID = crypto.randomUUID()
 
-async function sendMessage(message) {
+async function sendMessage(message, sessionId, candidate) {
   const response = await fetch("https://vi-codathon-vww2.vercel.app/api/interview", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      sessionId: SESSION_ID,
-      message: message,
-    }),
+     body: JSON.stringify({
+  sessionId,
+  candidate,
+  message,
+}),
   })
 
   if (!response.ok) {
@@ -158,7 +159,15 @@ const [interviewStarted, setInterviewStarted] = useState(false)
     setIsTyping(true)
 
     try {
-      const aiMessage = await sendMessage(trimmed, [...messages, candidateMessage])
+      const candidate = candidatesData.candidates.find(
+  (c) => c.member.id === selectedCandidate
+)
+
+const aiMessage = await sendMessage(
+  trimmed,
+  sessionId,
+  candidate
+)
       setMessages((prev) => [...prev, aiMessage])
     } finally {
       setIsTyping(false)
@@ -236,7 +245,44 @@ const [interviewStarted, setInterviewStarted] = useState(false)
         <button
           type="button"
           disabled={!selectedCandidate}
-          onClick={() => setInterviewStarted(true)}
+          onClick={async () => {
+  const candidate = candidatesData.candidates.find(
+    (c) => c.member.id === selectedCandidate
+  )
+
+  setInterviewStarted(true)
+
+  try {
+    const response = await fetch(
+      "https://vi-codathon-vww2.vercel.app/api/interview",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sessionId,
+          candidate,
+        }),
+      }
+    )
+
+    const data = await response.json()
+
+    if (data.reply) {
+      setMessages([
+        {
+          id: crypto.randomUUID(),
+          sender: "ai",
+          text: data.reply,
+          timestamp: new Date(),
+        },
+      ])
+    }
+  } catch (error) {
+    console.error("Interview initialization failed:", error)
+  }
+}}
           className="gradient-accent mt-5 w-full rounded-xl px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           Start Interview
