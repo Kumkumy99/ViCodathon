@@ -15,7 +15,7 @@ let replyIndex = 0
  const SESSION_ID = crypto.randomUUID()
 
 async function sendMessage(message) {
-  const response = await fetch("http://localhost:3000/api/interview", {
+  const response = await fetch("https://vi-codathon-vww2.vercel.app/api/interview", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -104,7 +104,7 @@ function HeaderBadge() {
 }
 
 export default function ChatWindow({
-  initialMessages = mockMessages,
+  initialMessages = [],
   feedback = mockFeedback,
 }) {
   const [messages, setMessages] = useState(initialMessages)
@@ -113,6 +113,9 @@ export default function ChatWindow({
   const [isLoading, setIsLoading] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
   const [isDark, setIsDark] = useState(true)
+  const [sessionId] = useState(() => crypto.randomUUID())
+  const [selectedCandidate, setSelectedCandidate] = useState('')
+const [interviewStarted, setInterviewStarted] = useState(false)
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
