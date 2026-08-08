@@ -12,20 +12,33 @@ let replyIndex = 0
  * Placeholder for backend integration.
  * Replace the mock delay/reply logic with your API call.
  */
-async function sendMessage(message, conversationHistory) {
-  await new Promise((resolve) => setTimeout(resolve, 1800))
+ const SESSION_ID = crypto.randomUUID()
 
-  const reply =
-    mockAiReplies[replyIndex % mockAiReplies.length] ??
-    "Thank you for your response. Let's continue."
+async function sendMessage(message) {
+  const response = await fetch("http://localhost:3000/api/interview", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sessionId: SESSION_ID,
+      message: message,
+    }),
+  })
 
-  replyIndex += 1
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`)
+  }
+
+  const data = await response.json()
 
   return {
     id: crypto.randomUUID(),
-    sender: 'ai',
-    text: reply,
+    sender: "ai",
+    text: data.reply,
     timestamp: new Date(),
+    done: data.done,
+    feedback: data.feedback,
   }
 }
 
