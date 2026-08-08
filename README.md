@@ -1,8 +1,8 @@
-# 🤖 AI Interview Assistant
+ # 🤖 AI Interview Assistant
 
 **AI Interview Assistant** is an AI-powered technical interview platform that conducts personalized mock interviews, evaluates candidate responses, and generates an intelligent performance report.
 
-The platform combines a conversational interview experience with AI-powered evaluation to simulate a realistic technical interview and provide actionable feedback to candidates.
+The platform combines a conversational interview experience with AI-powered evaluation and **Breeth-powered memory**, allowing interview interactions to be captured as meaningful memory rather than only as raw conversation history.
 
 ---
 
@@ -10,11 +10,11 @@ The platform combines a conversational interview experience with AI-powered eval
 
 ### 🌐 Frontend
 
-**https://vi-codathon-uvzc.vercel.app**
+https://vi-codathon-uvzc.vercel.app/
 
 ### ⚙️ Backend
 
-**https://vi-codathon-vww2.vercel.app**
+https://vi-codathon-vww2.vercel.app/
 
 ---
 
@@ -22,7 +22,7 @@ The platform combines a conversational interview experience with AI-powered eval
 
 Traditional mock interviews often rely on static questions and generic feedback.
 
-**AI Interview Assistant** provides a more interactive approach by using AI to conduct a multi-turn technical interview based on the candidate's profile, curriculum, and previous responses.
+**AI Interview Assistant** provides a more interactive approach by using AI to conduct a multi-turn technical interview based on the candidate's profile, curriculum, previous responses, and interview context.
 
 The system:
 
@@ -30,9 +30,11 @@ The system:
 2. Generates technical questions dynamically.
 3. Evaluates each response.
 4. Handles requests for hints.
-5. Maintains the interview conversation context.
-6. Conducts a 5-question interview.
-7. Generates a personalized AI evaluation report.
+5. Maintains interview conversation context.
+6. Adapts question difficulty based on candidate performance.
+7. Conducts an 8-question technical interview.
+8. Stores interview episodes using Breeth as a memory layer.
+9. Generates a personalized AI evaluation report.
 
 The final report provides a structured assessment of the candidate's:
 
@@ -59,7 +61,9 @@ The AI uses candidate information and curriculum data to personalize the intervi
 
 The interview is conducted through a conversational chat interface.
 
-The AI asks **one technical question at a time** and uses the candidate's previous response to determine the next question.
+The AI asks **one technical question at a time** and uses the candidate's previous responses to determine the next question.
+
+The interview contains **8 questions** with adaptive difficulty.
 
 ---
 
@@ -71,6 +75,7 @@ Questions are generated dynamically using:
 * Curriculum
 * Previous conversation history
 * Candidate responses
+* Current interview performance
 
 This prevents the interview from being a simple predefined questionnaire.
 
@@ -84,7 +89,47 @@ If the candidate:
 * Gets stuck
 * Requests a hint
 
-the AI provides a conceptual hint and continues the interview rather than immediately penalizing the candidate.
+the AI provides a conceptual hint and allows the candidate to retry rather than immediately revealing the complete answer.
+
+---
+
+## 🧠 Breeth Memory Layer
+
+**Breeth is used as the memory layer for the AI interview agent.**
+
+While Groq/Llama is responsible for reasoning and generating interview responses, Breeth captures interview interactions as structured memory.
+
+The flow is:
+
+```text
+Candidate Answer
+       ↓
+Interview Episode
+       ↓
+      Breeth
+       ↓
+Meaningful Memory
+```
+
+Instead of treating an interview as only a long transcript, the memory layer can capture the important information contained in interview episodes, including relevant entities, relationships, and cognitive patterns.
+
+This creates a foundation for maintaining meaningful candidate memory across interview interactions.
+
+### Current Breeth Integration
+
+The current implementation records interview episodes and sends them to Breeth as the memory layer.
+
+```text
+Candidate
+    ↓
+AI Interviewer
+    ↓
+Candidate Response
+    ↓
+Breeth Memory
+```
+
+This provides a foundation for future long-term candidate memory and context retrieval.
 
 ---
 
@@ -101,7 +146,7 @@ The AI interviewer is provided with security guardrails to prevent candidates fr
 
 ## 📊 AI-Powered Evaluation
 
-After five questions, the complete interview conversation is evaluated by the AI.
+After the 8-question interview, the complete interview is evaluated by the AI.
 
 The evaluation includes:
 
@@ -175,32 +220,38 @@ The application provides:
                     │ Candidate's Answer   │
                     └──────────┬───────────┘
                                │
-                               ▼
-                    ┌──────────────────────┐
-                    │ AI evaluates answer  │
-                    │ and generates next   │
-                    │ question             │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                         Repeat for
-                         5 Questions
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │   Final Evaluation   │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-              ┌─────────────────────────────────┐
-              │       Feedback Dashboard        │
-              │                                 │
-              │  • Summary                      │
-              │  • Performance Scores           │
-              │  • Strengths                    │
-              │  • Gaps                         │
-              │  • Recommended Next Steps       │
-              └─────────────────────────────────┘
+                    ┌──────────┴───────────┐
+                    ▼                      ▼
+          ┌──────────────────┐   ┌──────────────────┐
+          │  AI Evaluation   │   │  Breeth Memory   │
+          │  & Adaptation    │   │     Layer        │
+          └────────┬─────────┘   └──────────────────┘
+                   │
+                   ▼
+          ┌──────────────────────┐
+          │ Feedback / Next      │
+          │ Technical Question   │
+          └──────────┬───────────┘
+                     │
+                     ▼
+                 Repeat for
+                 8 Questions
+                     │
+                     ▼
+          ┌──────────────────────┐
+          │   Final Evaluation   │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌─────────────────────────────┐
+          │      Feedback Dashboard     │
+          │                             │
+          │ • Summary                   │
+          │ • Performance Scores        │
+          │ • Strengths                 │
+          │ • Gaps                      │
+          │ • Recommended Next Steps    │
+          └─────────────────────────────┘
 ```
 
 ---
@@ -224,7 +275,7 @@ The application provides:
 │                                 │
 │       /api/interview            │
 │                                 │
-│  Session Management              │
+│  Session Management             │
 │  Candidate Context              │
 │  Curriculum Context             │
 │  Conversation History           │
@@ -232,17 +283,28 @@ The application provides:
 │  AI Evaluation                  │
 └───────────────┬─────────────────┘
                 │
-                │ Groq API
-                ▼
-┌─────────────────────────────────┐
-│             GROQ                 │
-│                                 │
-│    llama-3.3-70b-versatile      │
-│               ↓                 │
-│    llama-3.1-8b-instant         │
-│          Fallback Model         │
-└─────────────────────────────────┘
+        ┌───────┴────────┐
+        │                │
+        ▼                ▼
+┌───────────────┐  ┌─────────────────┐
+│     GROQ      │  │     BREETH      │
+│               │  │                 │
+│ Llama 3.3 70B │  │ Memory Layer    │
+│       ↓       │  │                 │
+│ Llama 3.1 8B  │  │ Episode Storage │
+│   Fallback    │  │                 │
+└───────────────┘  └─────────────────┘
 ```
+
+### Component Responsibilities
+
+| Component           | Responsibility                                             |
+| ------------------- | ---------------------------------------------------------- |
+| **React Frontend**  | Candidate selection, chat interface, progress, feedback    |
+| **Next.js Backend** | API, sessions, interview orchestration                     |
+| **Groq / Llama**    | Question generation, response evaluation, final assessment |
+| **Breeth**          | Interview memory and episode storage                       |
+| **Vercel**          | Deployment and serverless execution                        |
 
 ---
 
@@ -295,41 +357,43 @@ AI Evaluation
 Feedback / Hint
        ↓
 Next Technical Question
+       ↓
+Breeth Episode Memory
 ```
 
-The conversation history is retained throughout the interview session.
+The interview continues for **8 questions**.
 
 ---
 
-## 5. Final Evaluation
+## 5. Memory Layer
 
-After five questions, the backend sends the complete conversation history to the AI evaluation pipeline.
+Interview interactions are recorded as episodes and sent to Breeth.
 
-The AI is instructed to return a structured JSON response.
-
-Example:
-
-```json
-{
-  "summary": "The candidate demonstrated a good understanding of core concepts.",
-  "scores": {
-    "coreFundamentals": 85,
-    "systemArchitecture": 75,
-    "problemSolving": 80
-  },
-  "strengths": [
-    "Strong understanding of fundamental concepts",
-    "Clear technical communication"
-  ],
-  "gaps": [
-    "Needs more practical system design experience"
-  ],
-  "next": [
-    "Practice production-level projects",
-    "Explore advanced system design concepts"
-  ]
-}
+```text
+Interview Interaction
+        ↓
+Episode
+        ↓
+Breeth
+        ↓
+Memory Representation
 ```
+
+Breeth serves as the dedicated memory layer, separating **AI reasoning** from **AI memory**.
+
+---
+
+## 6. Final Evaluation
+
+After eight questions, the interview is evaluated by the AI evaluation pipeline.
+
+The AI returns a structured JSON response containing:
+
+* Summary
+* Performance scores
+* Strengths
+* Knowledge gaps
+* Recommended next steps
 
 The generated evaluation is then displayed directly in the frontend.
 
@@ -361,6 +425,12 @@ The generated evaluation is then displayed directly in the frontend.
 * **Llama 3.1 8B Instant** as fallback
 * Structured JSON evaluation
 
+## Memory
+
+* **Breeth**
+* AI agent memory layer
+* Interview episode storage
+
 ## Data
 
 * JSON-based candidate profiles
@@ -380,7 +450,6 @@ The generated evaluation is then displayed directly in the frontend.
 AI-Interview-Assistant/
 │
 ├── frontend/
-│   │
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── ChatWindow.jsx
@@ -396,16 +465,14 @@ AI-Interview-Assistant/
 │   └── ...
 │
 ├── backend/
-│   │
 │   ├── app/
 │   │   └── ...
-│   │
 │   ├── data/
 │   │   ├── candidates.json
 │   │   └── curriculum.json
-│   │
 │   └── ...
 │
+├── prompts.md
 └── README.md
 ```
 
@@ -470,11 +537,11 @@ The application is deployed using **Vercel**.
 
 ### Frontend
 
-**https://vi-codathon-uvzc.vercel.app**
+https://vi-codathon-uvzc.vercel.app/
 
 ### Backend
 
-**https://vi-codathon-vww2.vercel.app**
+https://vi-codathon-vww2.vercel.app/
 
 The frontend communicates with the deployed backend through:
 
@@ -490,11 +557,13 @@ The backend is configured with CORS to allow requests from the deployed frontend
 
 The Groq API key is stored only on the backend.
 
-```env
+```text
 GROQ_API_KEY=your_groq_api_key
 ```
 
 The API key is never exposed to the frontend.
+
+Breeth credentials/configuration are also kept server-side and are not exposed to the frontend.
 
 ---
 
@@ -508,8 +577,7 @@ Make sure you have:
 * npm
 * Git
 * Groq API key
-
----
+* Breeth credentials/configuration
 
 ## Clone Repository
 
@@ -518,25 +586,21 @@ git clone <repository-url>
 cd AI-Interview-Assistant
 ```
 
----
-
 ## Install Dependencies
 
 ```bash
 npm install
 ```
 
----
-
 ## Configure Environment Variables
 
 Create a `.env.local` file for the backend:
 
-```env
+```text
 GROQ_API_KEY=your_groq_api_key
 ```
 
----
+Configure the required Breeth environment variables according to your Breeth setup.
 
 ## Start Development Server
 
@@ -553,6 +617,7 @@ Open the application in your browser and select a candidate to start the intervi
 The application includes several security considerations:
 
 * Groq API credentials remain server-side.
+* Breeth credentials remain server-side.
 * CORS is configured on the backend.
 * Prompt injection attempts are addressed through interviewer system instructions.
 * AI evaluation is constrained to a predefined JSON structure.
@@ -563,10 +628,10 @@ The application includes several security considerations:
 
 # 👩‍💻 Team
 
-| Member            | GitHub      | Role                   | Contributions                                                                                                                                                           |
-| ----------------- | ----------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Kumkum Yadav**  | `kumkumy99` | Frontend & Integration | Frontend UI/UX, React interface, candidate selection, chat interface, feedback dashboard, frontend-backend integration, deployment and Vercel configuration             |
-| **Kriti Dwivedi** | `kriti05`   | Backend & AI           | Backend development, Groq AI integration, interview engine, multi-turn interview logic, AI evaluation pipeline, memory handling, MCP integration and backend deployment |
+| Member            | GitHub      | Role                   | Contributions                                                                                                                                                                     |
+| ----------------- | ----------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Kumkum Yadav**  | `kumkumy99` | Frontend & Integration | Frontend UI/UX, React interface, candidate selection, chat interface, feedback dashboard, frontend-backend integration, deployment and Vercel configuration                       |
+| **Kriti Dwivedi** | `kriti05`   | Backend & AI           | Backend development, Groq AI integration, interview engine, multi-turn interview logic, AI evaluation pipeline, Breeth memory integration, MCP integration and backend deployment |
 
 ---
 
@@ -582,6 +647,7 @@ Potential future enhancements include:
 * Role-specific interview tracks
 * Interview analytics dashboard
 * Long-term candidate progress tracking
+* **Breeth-based long-term candidate memory retrieval**
 * Advanced MCP-based context retrieval
 * More detailed competency analysis
 
@@ -601,8 +667,12 @@ Curriculum
 Conversation History
         +
 Candidate Responses
+        +
+Breeth Memory
         ↓
-    AI Interviewer
+   AI Interviewer
+        ↓
+Adaptive Interview
         ↓
 Personalized Evaluation
 ```
@@ -615,8 +685,9 @@ The system aims to identify:
 * How they approach technical problems
 * Where their knowledge gaps exist
 * Which areas they should improve next
+* What information from the interview should be retained as memory
 
-This transforms a mock interview from a simple question-answer session into a **personalized AI-powered learning and assessment experience**.
+This transforms a mock interview from a simple question-answer session into a **personalized AI-powered learning, assessment, and memory experience**.
 
 ---
 
@@ -629,8 +700,8 @@ Built collaboratively by:
 
 ### 🔗 Quick Links
 
-* 🌐 **Live Demo:** https://vi-codathon-uvzc.vercel.app
-* ⚙️ **Backend:** https://vi-codathon-vww2.vercel.app
+* 🌐 **Live Demo:** https://vi-codathon-uvzc.vercel.app/
+* ⚙️ **Backend:** https://vi-codathon-vww2.vercel.app/
 * 💻 **GitHub:** Add your repository URL here
 
 ---
@@ -640,3 +711,4 @@ Built collaboratively by:
 Thank you for checking out **AI Interview Assistant**!
 
 We hope it demonstrates how conversational AI can make technical interview preparation more personalized, interactive, and actionable.
+
