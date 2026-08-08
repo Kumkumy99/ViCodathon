@@ -64,6 +64,12 @@ export default function MessageBubble({ message, isDark = true }) {
           {message.text}
         </div>
 
+        {isCandidate && message.savedEpisode && (
+          <span className={`px-1 text-[11px] ${isDark ? 'text-[#9ca3af]' : 'text-[#6b7280]'}`}>
+            📌 Episode saved to memory
+          </span>
+        )}
+
         <span className={`px-1 text-[11px] ${isDark ? 'text-[#b0a8c0]' : 'text-[#6b6280]'}`}>
           {formatTime(message.timestamp)}
         </span>

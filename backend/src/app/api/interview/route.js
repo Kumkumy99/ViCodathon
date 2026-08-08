@@ -8,9 +8,9 @@ import candidatesData from "@/data/candidates.json";
 export const maxDuration = 30;
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://vi-codathon-uvzc.vercel.app",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Expose-Headers": "X-Breeth-Episode-Saved",
 };
 
 function corsJson(data, options = {}) {

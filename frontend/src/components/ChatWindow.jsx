@@ -5,6 +5,7 @@ import FeedbackCard from './FeedbackCard'
 import { mockFeedback } from '../data/mockData'
 import candidatesData from '../data/candidates.json'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 const TOTAL_QUESTIONS = 8
 
 // -----------------------------------------------------------------------------
@@ -18,7 +19,7 @@ async function sendMessage(message, sessionId, candidate, history = []) {
     : candidate;
 
   const response = await fetch(
-    'https://vi-codathon-vww2.vercel.app/api/interview',
+    `${API_BASE_URL}/api/interview`,
     {
       method: 'POST',
       headers: {
@@ -38,6 +39,7 @@ async function sendMessage(message, sessionId, candidate, history = []) {
   }
 
   const data = await response.json()
+  const episodeSaved = response.headers.get('X-Breeth-Episode-Saved') === 'true'
 
   return {
     id: crypto.randomUUID(),
@@ -46,6 +48,7 @@ async function sendMessage(message, sessionId, candidate, history = []) {
     timestamp: new Date(),
     done: data.done,
     feedback: data.feedback,
+    episodeSaved,
   }
 }
 
@@ -243,7 +246,14 @@ export default function ChatWindow({
         formattedHistory
       )
 
-      setMessages((prev) => [...prev, aiMessage])
+      setMessages((prev) => [
+        ...prev.map((m) =>
+          m.id === candidateMessage.id
+            ? { ...m, savedEpisode: aiMessage.episodeSaved }
+            : m
+        ),
+        aiMessage,
+      ])
 
       if (aiMessage.done && aiMessage.feedback) {
         setFinalFeedback(aiMessage.feedback)
@@ -360,7 +370,7 @@ export default function ChatWindow({
 
               try {
                 const response = await fetch(
-                  'https://vi-codathon-vww2.vercel.app/api/interview',
+                  `${API_BASE_URL}/api/interview`,
                   {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
