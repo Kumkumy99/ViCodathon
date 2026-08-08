@@ -3,6 +3,29 @@ import Groq from "groq-sdk";
 import curriculumData from "@/data/curriculum.json";
 import candidatesData from "@/data/candidates.json";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "http://localhost:5173",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+
+function corsJson(data, options = {}) {
+  return NextResponse.json(data, {
+    ...options,
+    headers: {
+      ...corsHeaders,
+      ...(options.headers || {}),
+    },
+  });
+}
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
 // Initialize Groq SDK Client
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -30,6 +53,8 @@ async function getGroqCompletion(options) {
   }
 }
 
+
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -37,10 +62,10 @@ export async function POST(req) {
 
     // Step 1: Input Validation
     if (!sessionId || typeof sessionId !== "string") {
-      return NextResponse.json(
-        { error: "sessionId is required and must be a string" },
-        { status: 400 }
-      );
+       return corsJson({
+  reply: initialReply,
+  done: false,
+});
     }
 
     const sanitizedMessage = typeof message === "string" ? message.trim() : "";
@@ -96,10 +121,10 @@ Strict Operating Guidelines & Security Guardrails:
         .get(sessionId)
         .history.push({ role: "assistant", content: initialReply });
 
-      return NextResponse.json({
-        reply: initialReply,
-        done: false,
-      });
+       return corsJson({
+  reply: initialReply,
+  done: false,
+});
     }
 
     // -------------------------------------------------------------------------
@@ -163,12 +188,11 @@ Return ONLY a valid JSON object matching this schema:
       // Cleanup session state
       sessions.delete(sessionId);
 
-      return NextResponse.json({
-        reply:
-          "Thank you for completing the technical interview! Here is your final evaluation report.",
-        done: true,
-        feedback: feedbackData,
-      });
+      return corsJson({
+  reply: "Thank you for completing the technical interview! Here is your final evaluation report.",
+  done: true,
+  feedback: feedbackData,
+});
     }
 
     // -------------------------------------------------------------------------
@@ -192,15 +216,15 @@ Return ONLY a valid JSON object matching this schema:
 
     session.history.push({ role: "assistant", content: aiReply });
 
-    return NextResponse.json({
-      reply: aiReply,
-      done: false,
-    });
+    return corsJson({
+  reply: aiReply,
+  done: false,
+});
   } catch (error) {
     console.error("API Execution Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error in LLM pipeline" },
-      { status: 500 }
-    );
+     return corsJson(
+  { error: "Internal Server Error in LLM pipeline" },
+  { status: 500 }
+);
   }
 }
